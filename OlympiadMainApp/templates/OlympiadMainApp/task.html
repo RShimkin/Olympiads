@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% load static %}
+
+{% block js %}
+<script src="{% static '/js/task.js' %}"></script>
+<script src="{% static '/js/codemirror.js' %}"></script>
+<script src="{% static '/mode/python/python.js' %}"></script>
+<script src="{% static '/mode/clike/clike.js' %}"></script>
+<script src="{% static '/addon/scroll/simplescrollbars.js' %}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<link rel="stylesheet" href="{% static '/css/codemirror.css' %}">
+<link rel="stylesheet" href="{% static '/theme/dracula.css' %}">
+<link rel="stylesheet" href="{% static '/addon/scroll/simplescrollbars.css' %}">
+<link type="text/css" href="{% static 'css/common.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-3 mb-2 cont pt-2 pb-3 centerBlock">
+
+    <style>
+        .CodeMirror {
+            margin: 0 auto;
+            /*border: 4px solid #3a3a3a; 1100px */
+            font-size: 15px;
+            font-family: 'Viga', sans-serif;
+            border-radius: 10px;
+            line-height: 1.2em;
+            height: 20em;
+            width: 100%;
+            padding-top: 5px;
+        }
+
+        .customTable {
+            border-radius: 10px;
+        }
+        
+        .upper {
+            background-color: rgb(250, 236, 130);
+            border-radius: 10px;
+        }
+
+        .underline {
+            border-bottom:rgba(25, 24, 17, 0.2) 1px solid;
+        }
+
+        .mes {
+            font-style: oblique;
+        }
+    </style>
+
+    <div class="upper p-2 mb-3 mt-2">
+        <h2 class="underline">{{ task.name }}</h2>
+        <div class="underline">{{ task.description }}</div>
+        <div class="mes">{{ message }}</div>
+    </div>
+
+    <form action="{% url 'task' task.name %}" method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success sb sendButton float-sm-right">Отправить</button>
+    </form>
+    <div id="panel"></div>
+
+    <div id="rating_table">
+        <div class="pb-1 mt-3">
+            <table class="table table-dark table-inverse table-striped table-hover customTable">
+                <thead class="thead-default">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Пользователь</th>
+                    <th scope="col">Очки</th>
+                    <th scope="col">Время</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for i,res in rating %}
+                        <tr>
+                        <th scope="row">{{i}}</th>
+                        <td>{{ res.uname }}</td>
+                        <td>{{ res.points }}</td>
+                        <td>{{ res.time }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-3 mb-2 cont pt-2 centerBlock">
+
+    <p><a href="{% url 'createolympiad' %}" class="text-success" >создать олимпиаду</a></p>
+
+    <h2>{{title}}:</h2>
+
+    <div id="olympiads_table" class="pb-1 mt-3">
+        <table class="table table-light table-inverse">
+            <thead class="thead-default">
+            <tr>
+                <th scope="col" width="40%">Название</th>
+                <th scope="col" width="25%" class="text-center">Дата создания</th>
+                <th scope="col" width="22%" class="text-center">Создатель</th>
+                <th scope="col" width="13%" class="text-center">Результаты</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for olymp in olympiads %}
+                    <tr>
+                        <td><a href="{{ olymp.url }}">{{ olymp.name }}</a></td>
+                        <td class="text-center">{{ olymp.created }}</td>
+                        <td class="text-center">{{ olymp.creator }}</td>
+                        <td class="text-center">{{ olymp.count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

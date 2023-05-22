@@ -1,0 +1,17 @@
+.asteriskField {
+    display: none;
+}
+
+.choiceField {
+    display: inline-block;
+    width: 20%;
+}
+
+.sendButton {
+    display: inline-block;
+}
+
+.cont {
+    background-color: white;
+    border-radius: 20px;
+}

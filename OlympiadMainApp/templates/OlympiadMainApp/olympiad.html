@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block js %}
+<link type="text/css" href="{% static 'css/common.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-3 mb-2 cont pt-2 pb-3 centerBlock">
+
+    <style>
+        .customTable {
+            border-radius: 10px;
+        }   
+    </style>
+
+    <h2>{{ olymp.name }}</h2>
+
+    <p>{{ olymp.description }}</p>
+
+    {% if is_creator %}
+        <p><a href="{% url 'createtask' olymp_name=olymp.name %}">добавить задачу</a></p>
+    {% endif %}
+    <p>Задачи:</p>
+    {% for task in tasks %}
+        <p><a href="{{ task.get_absolute_url }}">{{ task.name }}</a></p>
+    {% endfor %}
+
+    <div id="rating_table" class="pb-1">
+        <table class="table table-dark table-inverse table-striped table-hover customTable">
+            <thead class="thead-default">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Пользователь</th>
+                <th scope="col">Очки</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for i,res in rating %}
+                    <tr>
+                    <th scope="row">{{i}}</th>
+                    <td>{{ res.uname }}</td>
+                    <td>{{ res.points }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

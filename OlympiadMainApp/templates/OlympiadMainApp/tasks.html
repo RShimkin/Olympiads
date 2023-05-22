@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-3 mb-2 cont pt-2 centerBlock">
+
+    <h1>{{title}}</h1>
+
+    <p><a href="{% url 'createtaskdef' %}" class="text-success">создать задачу</a></p>
+
+    <div id="tasks_table" class="pb-1 mt-3">
+        <table class="table table-light table-inverse">
+            <thead class="thead-default">
+            <tr>
+                <th scope="col" width="40%">Название</th>
+                <th scope="col" width="25%" class="text-center">Дата создания</th>
+                <th scope="col" width="22%" class="text-center">Создатель</th>
+                <th scope="col" width="13%" class="text-center">Результаты</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                    <tr>
+                        <td><a href="{{ task.url }}">{{ task.name }}</a></td>
+                        <td class="text-center">{{ task.created }}</td>
+                        <td class="text-center">{{ task.creator }}</td>
+                        <td class="text-center">{{ task.count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}
