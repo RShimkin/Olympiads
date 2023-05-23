@@ -2,20 +2,21 @@ from django import forms
 # from django.core.exceptions import ValidationError
 
 from .models import *
+from .langs import prog_langs
 
 class CodeForm(forms.Form):
     # title = forms.CharField(max_length=255, label="Название")
     content = forms.CharField(widget=forms.Textarea(attrs={
         'cols': 140, 'rows': 17, 'class':'form-control', 'id':'ta', 'required':False
     }), label='')
-    plang = forms.ChoiceField(choices=LANG_CHOICES, label='') #widget=forms.Select(attrs={'class':'choiceField'}), label='')
+    plang = forms.ChoiceField(choices=prog_langs.choices(), label='') #widget=forms.Select(attrs={'class':'choiceField'}), label='')
 
 class MyCodeForm(forms.Form):
-    title = forms.CharField(max_length=255, label='Название')
+    #title = forms.CharField(max_length=255, label='Название')
     content = forms.CharField(widget=forms.Textarea(attrs={
         'cols': 120, 'rows': 17, 'class':'form-control', 'id':'ta', 'required':False
     }), label='Код')
-    plang = forms.ChoiceField(choices=LANG_CHOICES, label='')
+    plang = forms.ChoiceField(choices=prog_langs.choices(), label='')
 
 '''
 class CreateTaskForm(forms.ModelForm):

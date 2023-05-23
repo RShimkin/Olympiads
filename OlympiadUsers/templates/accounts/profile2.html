@@ -5,10 +5,9 @@
 <div class="container mt-3 mb-2 cont pt-2">
     <h1>{{ title }}</h1>
 
-    <form action="{% url 'update_profile' %}" method="post">
+    <form action="{% url 'profile' %}" method="post">
         {% csrf_token %}
-        {{ user_form.as_p }}
-        {{ profile_form.as_p }}
+        {{ form.as_p}}
         <button type="submit">Сохранить</button>
     </form>
 </div>

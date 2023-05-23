@@ -59,7 +59,7 @@ WSGI_APPLICATION = 'Olympiads.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'db1',
+        'NAME': 'db2',
     }
 }
 

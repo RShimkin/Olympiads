@@ -11,6 +11,7 @@ from django.db.models import Q
 
 from .forms import *
 from .models import *
+from .workers import *
 
 def run_cpp(code, lang):
     fname = "main.cpp"
@@ -69,26 +70,6 @@ def test_create(code):
     command = f"g++ {fname} -o {outname}"
     arr = command.split(' ')
     res = subprocess.run(arr, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-
-def test_create2(code, username):
-    name = str(dt.datetime.now()).replace(' ','').replace(':','')
-    codename = f"processing/{name}.cpp"
-    progname = name #f"processing/{name}"
-
-    file = open(codename,"w")
-    file.write(code)
-    file.close()
-    
-    command = f"g++ {codename} -o processing/{progname}"
-    arr = command.split(' ')
-    res = subprocess.run(arr, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-    print(res.stdout.decode())
-    print(res.stderr.decode())
-    #command = f"firejail --apparmor --seccomp --quiet ./{progname}"
-    command = f"firejail --seccomp --quiet --private=./processing ./{progname}"
-    # firejail --apparmor --seccomp --quiet --private=./folder --blacklist=/ python3 killer.py
-    res = subprocess.run(command.split(' '), stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-    print(res.stdout.decode())
 
 def test_cpp(code):
     fname = "main.cpp"
@@ -335,22 +316,34 @@ def task(request, task_name):
         'cerror': comperr, 'cout': compout, 'out': out, 'err': err, 'score': score, 'rating': rating_map, 'message': message })
 
 def code(request):
-    #print(request.POST)
-    #print(request.headers)
-    err = out = comperr = compout = ""
     if request.method == 'POST':
         form = MyCodeForm(request.POST)
         if form.is_valid():
             formcontent = form.cleaned_data
             code = formcontent['content']
-            test_create2(code, request.user.username)
+            lang = formcontent['plang']
+            uname = None
+            if request.user.is_authenticated:
+                uname = request.user.username
+            (compil_status, compil_res, prog_name, folder_name) = prepare_program(code, lang, uname)
+            if compil_status == prog_statuses.COMPILED_ERR:
+                print('compilation error!')
+                return JsonResponse({ 'text': 'compilation error!' }, status=400)
+            (run_status, run_res) = run_program(prog_name, folder_name, lang)
+            if run_status == prog_statuses.RUN_SUC:
+                out = run_res.stdout.decode()
+                print(out)
+                return JsonResponse({ 'text': out }, status=200)
+            else:
+                print('runtime error!')
+                return JsonResponse({ 'text': 'runtime error!' }, status=400)
         else:
             print('invalid form')
     else:
         form = MyCodeForm()
 
     return render(request, 'OlympiadMainApp/code.html', 
-           {'title': 'Отправка кода', 'form': form, 'cerror': comperr, 'cout': compout, 'out': out, 'err': err})
+           {'title': 'Отправка кода', 'form': form })
 
 @login_required(login_url='signup')
 def create_task(request, olymp_name=None):

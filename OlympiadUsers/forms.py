@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from OlympiadMainApp.models import Profile
+
+from .models import Profile
 
 class SignUpForm(UserCreationForm):
     class Meta:
@@ -26,8 +27,12 @@ class SignUpForm(UserCreationForm):
         widget = forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password again'})
     )
 
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')
 
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['region']
+        fields = ['location', 'birth_date', 'year']

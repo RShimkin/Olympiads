@@ -6,7 +6,8 @@ from django.contrib.auth.models import User
 
 LANG_CHOICES = (
     ('C#', 'C#'),
-    ('C++', 'C++')
+    ('C++', 'C++'),
+    ('PYTHON', 'Python')
 )
 
 class TestData(dmodels.Model):
@@ -111,11 +112,8 @@ class Olympiad(dmodels.Model):
             models.Index(fields=['created'], name='olymp_created_idx')
         ]
 
-class Profile(dmodels.Model):
+class UserStats(dmodels.Model):
     user = dmodels.OneToOneField(User, on_delete=dmodels.CASCADE, verbose_name="Пользователь")
-    birth_date = dmodels.DateField(blank=True, default=None)
-    region = dmodels.CharField(max_length=1000, blank = True)
-    # year = ?
     tasks_results = dmodels.ArrayReferenceField(TaskResult, verbose_name="Результаты задач")
     olympiads_results = dmodels.ArrayReferenceField(OlympiadResult, verbose_name="Результаты олимпиад")
 
