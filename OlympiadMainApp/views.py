@@ -13,6 +13,8 @@ from .forms import *
 from .models import *
 from .workers import *
 
+from OlympiadUsers.access import *
+
 def run_cpp(code, lang):
     fname = "main.cpp"
     outname = f"outmain"
@@ -173,7 +175,8 @@ def run_tests(fname, curtask):
 def tasks(request):
     tasks = Task.objects.filter(Q(olympiadname=None) | Q(olympiadname=''))
     arr = [TaskViewModel(task) for task in tasks]
-    return render(request, 'OlympiadMainApp/tasks.html', {'title': 'Список отдельных заданий:','tasks': arr})
+    allow_create = has_groups(request.user, 'Creators')
+    return render(request, 'OlympiadMainApp/tasks.html', {'title': 'Список отдельных заданий:','tasks': arr, 'allow_create': allow_create})
 
 def update_task(request, task_name):
     curtask = Task.objects.get(name=task_name)
@@ -328,7 +331,7 @@ def code(request):
             (compil_status, compil_res, prog_name, folder_name) = prepare_program(code, lang, uname)
             if compil_status == prog_statuses.COMPILED_ERR:
                 print('compilation error!')
-                return JsonResponse({ 'text': 'compilation error!' }, status=400)
+                return JsonResponse({ 'text': 'compilation error!' }, status=200)
             (run_status, run_res) = run_program(prog_name, folder_name, lang)
             if run_status == prog_statuses.RUN_SUC:
                 out = run_res.stdout.decode()
@@ -336,7 +339,7 @@ def code(request):
                 return JsonResponse({ 'text': out }, status=200)
             else:
                 print('runtime error!')
-                return JsonResponse({ 'text': 'runtime error!' }, status=400)
+                return JsonResponse({ 'text': 'runtime error!' }, status=200)
         else:
             print('invalid form')
     else:
@@ -345,7 +348,8 @@ def code(request):
     return render(request, 'OlympiadMainApp/code.html', 
            {'title': 'Отправка кода', 'form': form })
 
-@login_required(login_url='signup')
+@login_required(login_url='login')
+@group_required('Creators')
 def create_task(request, olymp_name=None):
     if request.method == 'POST':
         print('post')
@@ -389,9 +393,11 @@ def create_task(request, olymp_name=None):
 def olympiads(request):
     olympiads = Olympiad.objects.all()
     arr = [OlympiadViewModel(olymp) for olymp in olympiads]
-    return render(request, 'OlympiadMainApp/olympiads.html', {'title': 'Список олимпиад','olympiads': arr})
+    allow_create = has_groups(request.user, 'Creators')
+    return render(request, 'OlympiadMainApp/olympiads.html', {'title': 'Список олимпиад','olympiads': arr, 'allow_create': allow_create})
 
 @login_required(login_url='signup')
+@group_required('Creators')
 def create_olympiad(request):
     if request.method == 'POST':
         form = CreateOlympiadForm(request.POST)

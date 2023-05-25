@@ -9,6 +9,9 @@
         {% csrf_token %}
         {{ user_form.as_p }}
         {{ profile_form.as_p }}
+        {% if not user_type_set %}
+        {{ user_type_form.as_p }}
+        {% endif %}
         <button type="submit">Сохранить</button>
     </form>
 </div>

@@ -1,27 +1,66 @@
 {% extends 'base.html' %}
 
+{% load crispy_forms_tags %}
+
+{% load static %}
+
+{% block js %}
+<script src="{% static '/js/code.js' %}"></script>
+<script src="{% static '/js/codemirror.js' %}"></script>
+<script src="{% static '/mode/python/python.js' %}"></script>
+<script src="{% static '/mode/clike/clike.js' %}"></script>
+<script src="{% static '/addon/scroll/simplescrollbars.js' %}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<link rel="stylesheet" href="{% static '/css/codemirror.css' %}">
+<link rel="stylesheet" href="{% static '/theme/dracula.css' %}">
+<link rel="stylesheet" href="{% static '/addon/scroll/simplescrollbars.css' %}">
+<link type="text/css" href="{% static 'css/common.css' %}" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
+
+<style>
+    .CodeMirror {
+        margin: 0 auto;
+        /*border: 4px solid #3a3a3a; 1100px */
+        font-size: 15px;
+        font-family: 'Viga', sans-serif;
+        border-radius: 10px;
+        line-height: 1.2em;
+        height: 20em;
+        width: 100%;
+        padding-top: 5px;
+    }
+
+    .customTable {
+        border-radius: 10px;
+    }
+    
+    .upper {
+        background-color: rgb(250, 236, 130);
+        border-radius: 10px;
+    }
+
+    .underline {
+        border-bottom:rgba(25, 24, 17, 0.2) 1px solid;
+    }
+
+    .mes {
+        font-style: oblique;
+    }
+</style>
+
+<div class="container mt-3 mb-2 cont pt-2 pb-3 centerBlock">
+
 <h1>{{title}}</h1>
 
 <form action="{% url 'home' %}" method="post">
     {% csrf_token %}
-    <div>
-    {% for field in form %}
-    <div class="form-group">
-        {{field.label_tag}}
-        <div>{{field}}</div>
-        {% if field.errors%}
-        {% for er in field.errors %}
-        <div class="alert alert-danger">
-            {{er}}
-        </div>
-        {% endfor %}
-        {% endif %}
-    </div>
-    {% endfor %}
-    </div>
-    <input type="submit" value="Send" class="btn btn-primary">
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-success sb sendButton float-sm-right">Отправить</button>
 </form>
+<div id="panel"></div>
+
+</div>
 
 {% endblock %}
-

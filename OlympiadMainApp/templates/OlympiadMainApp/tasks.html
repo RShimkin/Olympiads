@@ -4,9 +4,13 @@
 
 <div class="container mt-3 mb-2 cont pt-2 centerBlock">
 
-    <h1>{{title}}</h1>
+    <h2>{{title}}</h2>
 
-    <p><a href="{% url 'createtaskdef' %}" class="text-success">создать задачу</a></p>
+    {% if allow_create %}
+    <p>
+        <a href="{% url 'createtaskdef' %}" class="text-success">создать задачу</a>
+    </p>
+    {% endif %}
 
     <div id="tasks_table" class="pb-1 mt-3">
         <table class="table table-light table-inverse">

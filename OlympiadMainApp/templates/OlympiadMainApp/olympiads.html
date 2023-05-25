@@ -4,7 +4,7 @@
 
 <div class="container mt-3 mb-2 cont pt-2 centerBlock">
 
-    <p><a href="{% url 'createolympiad' %}" class="text-success" >создать олимпиаду</a></p>
+    {% if allow_create %}<p><a href="{% url 'createolympiad' %}" class="text-success" >создать олимпиаду</a></p>{% endif %}
 
     <h2>{{title}}:</h2>
 
