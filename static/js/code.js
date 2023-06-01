@@ -4,7 +4,8 @@ window.onload = function () {
 
     const langs = {
         'C#': 'text/x-c++src',
-        'C++': 'text/x-c++src'
+        'CPP': 'text/x-c++src',
+        'PYTHON': 'text/x-python'
     }
 
     document.querySelector('#div_id_plang').className += ' choiceField'
@@ -27,8 +28,11 @@ window.onload = function () {
             type: 'POST',
             url: location.href,
             success: function (resp) {
-                console.log("Получено")
-                console.log(resp)
+                if (resp.error) {
+                    panel.style = "color: red;"
+                } else {
+                    panel.style = "color: green;"
+                }
 
                 panel.innerText = resp.text
                 panel.className = "p-3"

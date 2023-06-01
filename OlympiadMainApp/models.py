@@ -2,7 +2,10 @@ from django.db import models
 from djongo import models as dmodels
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
 #import bson
+
+from OlympiadUsers.models import Profile
 
 LANG_CHOICES = (
     ('C#', 'C#'),
@@ -10,14 +13,38 @@ LANG_CHOICES = (
     ('PYTHON', 'Python')
 )
 
+class TaskType(models.TextChoices):
+    SIMPLECHOICE = 'SCH', _('choose one')
+    MULTIPLECHOICE = 'MCH', _('choose several')
+    FULLANSWER = 'FUL', _('full answer')
+    CODESIMPLETEST = 'CST', _('code with output comparison')
+    CODEDOUBLETEST = 'CDT', _('code with output test')
+
+'''class TestChoice(dmodels.Model):
+    text = dmodels.CharField(max_length=255, default=None)
+    correct = dmodels.BooleanField(default=False)
+
+    objects = dmodels.DjongoManager()
+
+    class Meta:
+        managed = False
+        #abstract = False'''
+
+
 class TestData(dmodels.Model):
-    testinput = dmodels.CharField(max_length=1000, primary_key=True, verbose_name="Текстовый ввод")
+    type = dmodels.CharField(max_length=3, choices=TaskType.choices, default=TaskType.CODESIMPLETEST, verbose_name="Тип задачи")
+    question = dmodels.TextField(max_length=1000, default=None, verbose_name="Вопрос задачи")
+    #choices = dmodels.ArrayField(model_container=TestChoice, verbose_name="Тестовые варианты")
+    testinput = dmodels.CharField(max_length=1000, primary_key=True, default=None, verbose_name="Текстовый ввод")
     testoutput = dmodels.CharField(max_length=1000, verbose_name="Текстовый вывод")
 
     objects = dmodels.DjongoManager()
 
     def __str__(self):
         return f"{self.testinput} -> {self.testoutput}"
+
+    def __getitem__(self, name):
+       return getattr(self, name)
     
     class Meta:
         managed = False
@@ -38,6 +65,67 @@ class TaskResult(dmodels.Model):
         indexes = [
             models.Index(fields=['uname'], name='res_name_idx'),
             models.Index(fields=['taskname'], name='res_task_idx')
+        ]
+
+class StandaloneTaskResult(dmodels.Model):
+    _id = dmodels.ObjectIdField(primary_key=True)
+    user = dmodels.ForeignKey(User, on_delete=dmodels.DO_NOTHING, default=None, verbose_name="Чей результат")
+    username = dmodels.CharField(max_length=255, verbose_name="Чей результат (имя пользователя)")
+    taskname = dmodels.CharField(max_length=255, verbose_name="Для какой задачи (название)")
+    points = dmodels.PositiveIntegerField(verbose_name='Вес в очках')
+    started = dmodels.DateTimeField(auto_now_add=False, default=None, verbose_name='Время начала выполнения')
+    finished = dmodels.DateTimeField(auto_now_add=False, default=None, verbose_name='Время начала выполнения')
+    attempts = dmodels.PositiveIntegerField(verbose_name='количество попыток')
+    inner_attempts = dmodels.PositiveIntegerField(verbose_name='количество внутренних отправлений')
+    success = dmodels.BooleanField(verbose_name='статус выполнения')
+
+    objects = dmodels.DjongoManager()
+
+    class Meta:
+        verbose_name = 'Пользовательский результат по задаче'
+        verbose_name_plural = 'результаты'
+        ordering = ['-points']
+        indexes = [
+            #models.Index(fields=['guid']),
+            #models.Index(fields=['slug'], name='task_slug_idx'),
+        ]
+
+class StandaloneTask(dmodels.Model):
+    _id = dmodels.ObjectIdField(primary_key=True)
+    guid = dmodels.TextField(default=None)          # delete
+    name = dmodels.CharField(max_length=255, unique=True, verbose_name="Название задачи")
+    short_description = dmodels.TextField(max_length=500, verbose_name="Краткое описание задачи")
+    description = dmodels.TextField(max_length=10000, verbose_name='Полное описание задачи')
+    points = dmodels.PositiveIntegerField(verbose_name='Вес в очках')
+    active = dmodels.BooleanField(default=True)
+    creator = dmodels.ForeignKey(User, on_delete=dmodels.DO_NOTHING, default=None, verbose_name="Создатель задачи")
+    tests = dmodels.ArrayField(model_container=TestData, default=None, verbose_name="Тесты")
+    created = dmodels.DateTimeField(auto_now_add=True, verbose_name="Время создания")
+    since = dmodels.DateTimeField(default=None, verbose_name="Активна с")
+    until = dmodels.DateTimeField(default=None, verbose_name="Активна до")
+    results = dmodels.ArrayReferenceField(to=TaskResult, default=None, on_delete=models.DO_NOTHING, verbose_name="Результаты пользователей")
+    hidden = dmodels.BooleanField(default=False, verbose_name="Закрытый доступ")
+    tasktype = dmodels.CharField(max_length=3, choices=TaskType.choices, default=TaskType.CODESIMPLETEST)
+    #choices = dmodels.ArrayField(model_container=TestChoice, default=None, verbose_name="Тестовые варианты")
+
+    objects = dmodels.DjongoManager()
+
+    def get_view_url(self):
+        return reverse('viewstask', kwargs={'task_oid': str(self._id)})
+    
+    def get_edit_url(self):
+        return reverse('editstask', kwargs={'task_oid': str(self._id)})
+
+    def __str__(self):
+        return f"stask #{str(self._id)}"
+
+    class Meta:
+        verbose_name = 'Задача'
+        verbose_name_plural = 'Задачи'
+        ordering = ['created']
+        indexes = [
+            models.Index(fields=['guid']),
+            #models.Index(fields=['slug'], name='task_slug_idx'),
         ]
 
 class Task(dmodels.Model):
@@ -124,6 +212,12 @@ class UserStats(dmodels.Model):
 
 class TestJson(dmodels.Model):
     content = dmodels.JSONField()
+    text = dmodels.TextField(default=None)
+    profileref = dmodels.OneToOneField(Profile, on_delete=dmodels.DO_NOTHING, default=None)
+    taskref = dmodels.OneToOneField(Task, on_delete=dmodels.DO_NOTHING, default=None)
+    #taskref = dmodels.GenericObjectIdField()
+
+    objects = dmodels.DjongoManager()
 
 class OlympiadViewModel():
     def __init__(self, olymp):
@@ -138,5 +232,14 @@ class TaskViewModel():
         self.url = task.get_absolute_url()
         self.name = task.name
         self.count = len(task.results.all())
+        self.creator = task.creator.username if task.creator != None else ''
+        self.created = task.created
+
+class StandaloneTaskViewModel():
+    def __init__(self, task):
+        self.view_url = task.get_view_url()
+        self.edit_url = task.get_edit_url()
+        self.name = task.name
+        #self.count = len(task.results.all())
         self.creator = task.creator.username if task.creator != None else ''
         self.created = task.created

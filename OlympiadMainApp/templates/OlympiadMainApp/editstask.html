@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container mt-3 mb-2 cont pt-2 pb-2 centerBlock">
+
+    <h1>{{title}}</h1>
+
+    <form action="{% url 'editstask' oid %}" method="post">
+        {% csrf_token %}
+        {{ form | crispy }}
+        <input type="submit" value="Сохранить" class="btn btn-primary">
+    </form>
+
+    <form action="{% url 'editstask' oid %}" method="post">
+        {% csrf_token %}
+        {{ testdataform | crispy }}
+        <input type="submit" value="Добавить" class="btn btn-primary">
+    </form>
+
+    <a href="{% url 'updatetask' oid %}">Добавить тесты</a>
+
+</div>
+
+{% endblock %}

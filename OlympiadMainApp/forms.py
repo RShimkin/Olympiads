@@ -1,4 +1,6 @@
 from django import forms
+from django.forms.widgets import NumberInput
+from datetime import datetime
 # from django.core.exceptions import ValidationError
 
 from .models import *
@@ -26,6 +28,39 @@ class CreateTaskForm(forms.ModelForm):
 '''
 
 class CreateTaskForm(forms.Form):
+    name = forms.CharField(max_length=255, label='Название задачи')
+    short_description = forms.CharField(widget=forms.Textarea(attrs={
+        'cols':50, 'rows':5, 'class':'form-control','required':False
+    }), label='Краткое описание задачи')
+    description = forms.CharField(widget=forms.Textarea(attrs={
+        'cols':50, 'rows':17, 'class':'form-control','required':False
+    }), label='Описание задачи и требования')
+    points = forms.IntegerField(initial=10, label="Количество очков")
+    since = forms.DateTimeField(
+        initial = datetime.now(),
+        widget = NumberInput(attrs={'type': 'datetime-local'}),
+        label = "Активна с")
+    until = forms.DateTimeField(
+        initial = datetime.now(),
+        widget = NumberInput(attrs={'type': 'datetime-local'}),
+        label="Активна до")
+    tasktype = forms.ChoiceField(
+        label = 'Тип задачи',
+        required = True,
+        choices = TaskType.choices
+    )
+    #active = forms.BooleanField(initial=True, label="Активна?")
+
+class EditStaskForm(forms.ModelForm):
+    class Meta:
+        model = StandaloneTask
+        fields = ('name', 'description', 'since')
+
+class SimpleCodeTestDataForm(forms.Form):
+    input = forms.CharField()
+    output = forms.CharField()
+
+class CreateTaskForm2(forms.Form):
     name = forms.CharField(max_length=255, label='Название задачи')
     description = forms.CharField(widget=forms.Textarea(attrs={
         'cols':50, 'rows':17, 'class':'form-control','required':False

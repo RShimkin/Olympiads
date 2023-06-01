@@ -10,14 +10,12 @@ class prog_langs(Enum):
         return tuple((i.name, i.value) for i in cls)
 
 def get_processor(pg):
-    print('pg:',pg)
     if pg == prog_langs.CPP.name:
         return cpp_processor()
     elif pg == prog_langs.PYTHON.name:
         return python_processor()
     else:
         print('wtf:',pg)
-        print(str(prog_langs.CPP))
         return None
 
 class cpp_processor:

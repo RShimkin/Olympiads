@@ -12,6 +12,7 @@ class prog_statuses(Enum):
     COMPILE_NO = "interpretable"
     RUN_SUC = "run successfully"
     RUN_ERR = "runtime error"
+    RUN_TOE = "timeout violation"
 
 def prepare_program(code, lang, uname):
     lang_processor = get_processor(lang)
@@ -20,10 +21,10 @@ def prepare_program(code, lang, uname):
 
     (compile_status, compile_result, prog_name) = compile_code(folder=folder_name, code=code_file_name, processor=lang_processor)
 
+    if compile_status != prog_statuses.COMPILE_NO:
+        remove_program(folder_name, lang_processor.fname_ext(code_file_name), None)
+
     return (compile_status, compile_result, prog_name, folder_name)
-    
-    #res = sp.run(command.split(' '), stdout = sp.PIPE, stderr = sp.PIPE)
-    #print(res.stdout.decode())
 
 def run_program(prog, folder, lang, testinput=None):
 
@@ -36,15 +37,15 @@ def run_program(prog, folder, lang, testinput=None):
 
     return result
 
-def remove_program(code_name = None, prog_name = None):
+def remove_program(folder, code_name = None, prog_name = None):
+    code_name = f"{folder}/{code_name}"
+    prog_name = f"{folder}/{prog_name}"
     if code_name != None and os.path.isfile(code_name):
         os.remove(code_name)
     if prog_name != None and os.path.isfile(prog_name):
         os.remove(prog_name)
 
 def save_code(code, processor, username):
-    print(code)
-    print(username)
     fname = str(dt.datetime.now()).replace(' ','').replace(':','').replace('.','')
     folder = "processing"
     if username != None:
@@ -69,8 +70,6 @@ def compile_code(folder, code, processor):
         command = processor.compile_str(source_fname=full_code_name, target_fname=full_prog_name) #f"g++ {codename} -o processing/{progname}"
         arr = command.split(' ')
         result = sp.run(arr, stdout = sp.PIPE, stderr = sp.PIPE)
-        #print(res.stdout.decode())
-        #print(res.stderr.decode())
         if result.stderr.decode() == "":
             return (prog_statuses.COMPILED_SUC, result, code)
         else:
@@ -81,8 +80,15 @@ def compile_code(folder, code, processor):
 def run_code(folder, prog, processor):
     firejail_str = f"firejail --seccomp --quiet --blacklist=/ --private=./{folder}"
     command = f"{firejail_str} {processor.run_str(prog)}"
-    res = sp.run(command.split(' '), stdout = sp.PIPE, stderr = sp.PIPE)
     status = prog_statuses.RUN_SUC
-    if res.stderr.decode():
+    try:
+        res = sp.run(command.split(' '), stdout = sp.PIPE, stderr = sp.PIPE, timeout=3)
+    except sp.TimeoutExpired as e:
+        status = prog_statuses.RUN_TOE
+        res = None
+    except Exception as e:
+        raise e
+
+    if res is not None and res.stderr.decode():
         status = prog_statuses.RUN_ERR
     return (status, res)
