@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container mt-3 mb-2 cont pt-2 pb-2 centerBlock">
+
+    <form action="{% url 'filetest' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success sb">Загрузить</button>
+    </form>
+
+</div>
+
+{% endblock %}

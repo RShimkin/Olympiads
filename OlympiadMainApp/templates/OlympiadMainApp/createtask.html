@@ -10,7 +10,20 @@
 
     <form action="{% url 'createstask' %}" method="post">
         {% csrf_token %}
-        {{ form | crispy }}
+        {{ form.name | as_crispy_field}}
+        {{ form.short_description | as_crispy_field}}
+        {{ form.description | as_crispy_field}}
+        <div class="form-row">
+            <div class="form-group m-2">
+                {{ form.since | as_crispy_field}}
+            </div>
+            <div class="form-group m-2">
+                {{ form.until | as_crispy_field}}
+            </div>
+            <div class="form-group m-2">
+                {{ form.tasktype | as_crispy_field}}
+            </div>
+        </div>
         <input type="submit" value="Send" class="btn btn-primary">
     </form>
 

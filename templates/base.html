@@ -25,7 +25,7 @@
         <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between position-sticky" id="navbarNav">
             <ul class="navbar-nav flex-grow-1">
                 <li class="nav-item">
-                    <a class="nav-link text-info" href="{% url 'olympiads' %}">Олимпиады</a>
+                    <a class="nav-link text-info">Олимпиады</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-info" href="{% url 'tasks' %}">Задачи</a>
@@ -43,6 +43,9 @@
                         <a class="nav-link text-info" href="{% url 'signup' %}">Регистрация</a>
                     </li>
                 {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link text-info" href="{% url 'update_profile' %}">Профиль</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link text-info" href="{% url 'custom_logout' %}">Выйти</a>
                     </li>

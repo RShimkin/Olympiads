@@ -13,8 +13,9 @@ urlpatterns = [
     #path('createtask/<olymp_name>/', create_task, name='createtask'),
     #path('updatetask/<task_name>/', update_task, name='updatetask'),
     path('updatetask/<task_oid>/', update_task, name='updatetask'),
-    path('olympiads/', olympiads, name='olympiads'),
-    path('createolympiad', create_olympiad, name='createolympiad'),
-    path('olympiad/<olymp_name>/', olympiad, name='olympiad'),
-    path('test/', test, name='test')
+    #path('olympiads/', olympiads, name='olympiads'),
+    #path('createolympiad', create_olympiad, name='createolympiad'),
+    #path('olympiad/<olymp_name>/', olympiad, name='olympiad'),
+    path('test/', test, name='test'),
+    path('filetest/', filetest, name='filetest')
 ]

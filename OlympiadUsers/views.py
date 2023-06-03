@@ -52,14 +52,16 @@ def update_profile(request):
             profile_form.save()
             user_type_data = user_type_form.cleaned_data
             request.user.profile.user_type = user_type_data['usertype']
-            if user_type_data['usertype'] == UserType.CREATOR:
+            if user_type_data['usertype'] == UserType.CREATOR.name:
                 group = Group.objects.get(name='Creators')
-                request.user.groups.add(group)
             else:
                 group = Group.objects.get(name='Participants')
+            if request.user.groups.filter(name=group.name).count() == 0:
                 request.user.groups.add(group)
-            request.user.save()
-            #messages.success(request, _('Your profile was successfully updated!'))
+                request.user.save()
+                request.user.save()
+            messages.success(request, 'Профиль успешно обновлён!')
+            #messages.success(request, _('Профиль успешно обновлён!'))
             #return redirect('settings:profile')
             return render(request, 'accounts/profile.html', {
                 'user_form': user_form,

@@ -24,6 +24,8 @@ def group_required_or_anon(*group_names):
 
 def has_groups(user, *group_names):
     if user.is_authenticated:
+        print(user.groups)
+        print(user.groups.all())
         if bool(user.groups.filter(name__in=group_names)) or user.is_superuser:
                 return True
     return False

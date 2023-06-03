@@ -30,12 +30,12 @@ class CreateTaskForm(forms.ModelForm):
 class CreateTaskForm(forms.Form):
     name = forms.CharField(max_length=255, label='Название задачи')
     short_description = forms.CharField(widget=forms.Textarea(attrs={
-        'cols':50, 'rows':5, 'class':'form-control','required':False
+        'cols':50, 'rows':2, 'class':'form-control','required':False
     }), label='Краткое описание задачи')
     description = forms.CharField(widget=forms.Textarea(attrs={
-        'cols':50, 'rows':17, 'class':'form-control','required':False
+        'cols':50, 'rows':10, 'class':'form-control','required':False
     }), label='Описание задачи и требования')
-    points = forms.IntegerField(initial=10, label="Количество очков")
+    #points = forms.IntegerField(initial=10, label="Количество очков")
     since = forms.DateTimeField(
         initial = datetime.now(),
         widget = NumberInput(attrs={'type': 'datetime-local'}),
@@ -79,3 +79,6 @@ class CreateOlympiadForm(forms.Form):
 class TestDataForm(forms.Form):
     input = forms.CharField()
     output = forms.CharField()
+
+class FileTestForm(forms.Form):
+    file = forms.FileField(label="Файл")

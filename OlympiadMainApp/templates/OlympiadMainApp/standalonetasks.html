@@ -35,7 +35,7 @@
                         <td><a href="{{ task.view_url }}">{{ task.name }}</a></td>
                         <td class="text-center">{{ task.created }}</td>
                         <td class="text-center">{{ task.creator }}</td>
-                        <td class="text-center">?</td>
+                        <td class="text-center">{{ task.count }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
